@@ -1,5 +1,7 @@
 # Prompt Rewriter
 
+[![CI](https://github.com/Zinga18018/prompt-rewriter/actions/workflows/ci.yml/badge.svg)](https://github.com/Zinga18018/prompt-rewriter/actions/workflows/ci.yml)
+
 Turn rough selected text into a structured, paste-ready AI prompt with one global hotkey.
 
 Prompt Rewriter is a Windows-first Python desktop tool. Select text in an editable app, press

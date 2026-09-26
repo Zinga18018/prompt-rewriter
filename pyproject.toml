@@ -48,6 +48,11 @@ dev = [
 [project.scripts]
 prompt-rewriter = "prompt_rewriter.cli:main"
 
+[project.urls]
+Homepage = "https://github.com/Zinga18018/prompt-rewriter"
+Repository = "https://github.com/Zinga18018/prompt-rewriter"
+Issues = "https://github.com/Zinga18018/prompt-rewriter/issues"
+
 [tool.setuptools.packages.find]
 where = ["src"]
 
