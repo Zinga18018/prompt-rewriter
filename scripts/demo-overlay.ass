@@ -1,0 +1,65 @@
+[Script Info]
+; Cinematic overlay for the Prompt Rewriter demo.
+; Timings match the 24-second edit produced by scripts/render_demo.ps1.
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Hero,Bahnschrift SemiBold,92,&H00FAFCFF,&H00FAFCFF,&H00100805,&H7A080503,-1,0,0,0,100,100,3.5,0,1,2.2,2.8,5,80,80,40,1
+Style: HeroSub,Segoe UI,34,&H00E9F3FA,&H00E9F3FA,&H00100805,&H70080503,0,0,0,0,100,100,1.2,0,1,1.4,1.8,5,120,120,40,1
+Style: Eyebrow,Bahnschrift SemiBold,22,&H00FFE06A,&H00FFE06A,&H00100805,&H60080503,-1,0,0,0,100,100,3.2,0,1,1.2,1.4,5,90,90,30,1
+Style: Brand,Bahnschrift SemiBold,28,&H00FAFCFF,&H00FAFCFF,&H00100805,&H70080503,-1,0,0,0,100,100,2.2,0,1,1.5,1.6,7,74,74,46,1
+Style: Status,Segoe UI Semibold,18,&H00CEE8F7,&H00CEE8F7,&H00100805,&H70080503,-1,0,0,0,100,100,1.0,0,1,1.0,1.2,9,74,74,51,1
+Style: Step,Bahnschrift SemiBold,34,&H00FAFCFF,&H00FAFCFF,&H00100805,&H70080503,-1,0,0,0,100,100,2.0,0,1,1.6,1.8,5,90,90,34,1
+Style: Caption,Segoe UI,23,&H00DCEAF4,&H00DCEAF4,&H00100805,&H70080503,0,0,0,0,100,100,0.6,0,1,1.2,1.2,5,90,90,30,1
+Style: Hotkey,Bahnschrift SemiBold,31,&H00FAFCFF,&H00FAFCFF,&H00FFE06A,&H95140A06,-1,0,0,0,100,100,1.6,0,3,3.0,1.8,5,80,80,28,1
+Style: Process,Segoe UI Semibold,21,&H00FFE06A,&H00FFE06A,&H00100805,&H8A160C07,-1,0,0,0,100,100,1.4,0,3,1.6,1.1,5,80,80,26,1
+Style: Chip,Segoe UI Semibold,19,&H00F0F8FC,&H00F0F8FC,&H00FFE06A,&H9A1B1009,-1,0,0,0,100,100,1.1,0,3,1.2,1.0,5,22,22,24,1
+Style: Fine,Segoe UI,17,&H00BCD0DE,&H00BCD0DE,&H00100805,&H70080503,0,0,0,0,100,100,0.5,0,1,1.0,1.0,5,90,90,26,1
+Style: OutroTitle,Bahnschrift SemiBold,72,&H00FAFCFF,&H00FAFCFF,&H00100805,&H78080503,-1,0,0,0,100,100,3.0,0,1,2.0,2.5,5,90,90,30,1
+Style: OutroTag,Segoe UI Semibold,31,&H00E9F3FA,&H00E9F3FA,&H00100805,&H70080503,0,0,0,0,100,100,1.2,0,1,1.3,1.5,5,100,100,30,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+; Intro
+Dialogue: 1,0:00:00.25,0:00:03.75,Eyebrow,,0,0,0,,{\fad(350,300)\pos(960,332)}WINDOWS DESKTOP AI TOOL
+Dialogue: 1,0:00:00.45,0:00:03.75,Hero,,0,0,0,,{\fad(420,300)\pos(960,438)}PROMPT REWRITER
+Dialogue: 1,0:00:00.85,0:00:03.75,HeroSub,,0,0,0,,{\fad(420,300)\pos(960,536)}Rough intent  →  structured AI prompts
+Dialogue: 1,0:00:01.25,0:00:03.70,Fine,,0,0,0,,{\fad(350,250)\pos(960,653)}ONE HOTKEY  •  FIVE USEFUL FIELDS  •  LOCAL OR CLOUD
+Dialogue: 0,0:00:00.70,0:00:03.65,Eyebrow,,0,0,0,,{\fad(350,250)\an7\pos(690,598)\p1\1c&HFFE06A&\1a&H28&}m 0 0 l 540 0 l 540 3 l 0 3{\p0}
+
+; Persistent main-demo header
+Dialogue: 2,0:00:03.95,0:00:19.05,Brand,,0,0,0,,{\fad(220,220)}PROMPT REWRITER
+Dialogue: 2,0:00:03.95,0:00:19.05,Status,,0,0,0,,{\fad(220,220)}LIVE WORKFLOW  •  OLLAMA
+
+; Rough input
+Dialogue: 2,0:00:04.12,0:00:07.80,Step,,0,0,0,,{\fad(220,220)\pos(960,176)}01  •  ROUGH INPUT
+Dialogue: 2,0:00:04.35,0:00:07.78,Caption,,0,0,0,,{\fad(220,220)\pos(960,228)}Start with the thought exactly as you have it.
+
+; Hotkey and local processing
+Dialogue: 3,0:00:08.08,0:00:10.35,Hotkey,,0,0,0,,{\fad(180,180)\pos(960,208)}CTRL   +   SHIFT   +   SPACE
+Dialogue: 3,0:00:08.25,0:00:10.30,Caption,,0,0,0,,{\fad(180,180)\pos(960,257)}Copy → rewrite → replace in the same window
+Dialogue: 3,0:00:10.18,0:00:11.95,Process,,0,0,0,,{\fad(120,160)\pos(960,232)}LOCAL AI  •  REWRITING IN PLACE
+Dialogue: 3,0:00:10.38,0:00:11.92,Fine,,0,0,0,,{\fad(120,160)\pos(960,956)}This recorded demo used Ollama only.
+
+; Result
+Dialogue: 3,0:00:12.10,0:00:18.82,Step,,0,0,0,,{\fad(220,260)\pos(960,176)}02  •  STRUCTURED PROMPT
+Dialogue: 3,0:00:12.35,0:00:18.78,Caption,,0,0,0,,{\fad(220,260)\pos(960,228)}Clean structure, pasted back where you were typing.
+Dialogue: 4,0:00:12.65,0:00:18.65,Chip,,0,0,0,,{\fad(220,240)\pos(335,972)}  ROLE  
+Dialogue: 4,0:00:12.72,0:00:18.65,Chip,,0,0,0,,{\fad(220,240)\pos(650,972)}  CONTEXT  
+Dialogue: 4,0:00:12.79,0:00:18.65,Chip,,0,0,0,,{\fad(220,240)\pos(960,972)}  TASK  
+Dialogue: 4,0:00:12.86,0:00:18.65,Chip,,0,0,0,,{\fad(220,240)\pos(1270,972)}  CONSTRAINTS  
+Dialogue: 4,0:00:12.93,0:00:18.65,Chip,,0,0,0,,{\fad(220,240)\pos(1585,972)}  OUTPUT  
+
+; Outro
+Dialogue: 1,0:00:19.30,0:00:23.75,Eyebrow,,0,0,0,,{\fad(320,360)\pos(960,315)}BUILT IN PYTHON
+Dialogue: 1,0:00:19.48,0:00:23.78,OutroTitle,,0,0,0,,{\fad(360,360)\pos(960,420)}PROMPT REWRITER
+Dialogue: 1,0:00:19.85,0:00:23.75,OutroTag,,0,0,0,,{\fad(360,360)\pos(960,520)}Select. Rewrite. Keep moving.
+Dialogue: 1,0:00:20.25,0:00:23.70,Fine,,0,0,0,,{\fad(320,340)\pos(960,630)}GLOBAL HOTKEY  •  STRUCTURED OUTPUT  •  FOCUS + CLIPBOARD CHECKS
+Dialogue: 1,0:00:20.55,0:00:23.70,Fine,,0,0,0,,{\fad(320,340)\pos(960,684)}OLLAMA LOCAL MODE  •  GROQ → OLLAMA FALLBACK
+Dialogue: 1,0:00:20.85,0:00:23.72,OutroTag,,0,0,0,,{\fad(320,340)\fs24\1c&HFFE06A&\pos(960,770)}github.com/Zinga18018/prompt-rewriter

@@ -1,0 +1,23 @@
+.venv/
+.env
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+build/
+dist/
+*.egg-info/
+
+# Local demo capture intermediates. Curated media belongs under assets/.
+/.tmp-cinematic/
+/demo_frames/
+/prompt-rewriter-capture-*.mp4
+/prompt-rewriter-live-demo*.mp4
+/prompt-rewriter-demo*.mp4
+/prompt-rewriter-demo-contact-sheet.png
+/prompt-rewriter-transition-contact-sheet.png
+/prompt-rewriter-v2-contact.png
+/prompt-rewriter-v2-transition.png
+/*.log
