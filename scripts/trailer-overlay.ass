@@ -1,0 +1,63 @@
+[Script Info]
+; Editorial transcription of the captured request and result.
+; The small inset is the actual Notepad recording. This is edited pacing.
+ScriptType: v4.00+
+PlayResX: 1920
+PlayResY: 1080
+WrapStyle: 0
+ScaledBorderAndShadow: yes
+YCbCr Matrix: TV.709
+
+[V4+ Styles]
+Format: Name, Fontname, Fontsize, PrimaryColour, SecondaryColour, OutlineColour, BackColour, Bold, Italic, Underline, StrikeOut, ScaleX, ScaleY, Spacing, Angle, BorderStyle, Outline, Shadow, Alignment, MarginL, MarginR, MarginV, Encoding
+Style: Brand,Bahnschrift SemiBold,36,&H00F7FFF8,&H00F7FFF8,&H0007110D,&H8007110D,-1,0,0,0,100,100,2.0,0,1,1.2,0.4,7,0,0,0,1
+Style: Kicker,Segoe UI Semibold,21,&H00B4E670,&H00B4E670,&H0007110D,&H8007110D,-1,0,0,0,100,100,1.7,0,1,0.8,0,7,0,0,0,1
+Style: Input,Segoe UI Semibold,52,&H00F7FFF8,&H00F7FFF8,&H0007110D,&H8007110D,-1,0,0,0,100,100,0,0,1,1.0,0.5,7,0,0,0,1
+Style: Action,Bahnschrift SemiBold,70,&H00F7FFF8,&H00F7FFF8,&H0007110D,&H8007110D,-1,0,0,0,100,100,1.1,0,1,1.1,0.5,7,0,0,0,1
+Style: Label,Segoe UI Semibold,20,&H00B4E670,&H00B4E670,&H0007110D,&H8007110D,-1,0,0,0,100,100,1.4,0,1,0.6,0,7,0,0,0,1
+Style: Value,Segoe UI Semibold,34,&H00F7FFF8,&H00F7FFF8,&H0007110D,&H8007110D,-1,0,0,0,100,100,0,0,1,0.8,0,7,0,0,0,1
+Style: Task,Segoe UI,29,&H00F7FFF8,&H00F7FFF8,&H0007110D,&H8007110D,0,0,0,0,100,100,0,0,1,0.8,0,7,0,0,0,1
+Style: ProofHead,Bahnschrift SemiBold,27,&H00F7FFF8,&H00F7FFF8,&H0007110D,&H8007110D,-1,0,0,0,100,100,1.0,0,1,0.8,0,7,0,0,0,1
+Style: Proof,Segoe UI,22,&H00BDCFC0,&H00BDCFC0,&H0007110D,&H8007110D,0,0,0,0,100,100,0,0,1,0.8,0,7,0,0,0,1
+Style: Status,Bahnschrift SemiBold,32,&H00B4E670,&H00B4E670,&H0007110D,&H8007110D,-1,0,0,0,100,100,1.0,0,1,0.8,0,7,0,0,0,1
+Style: Footer,Segoe UI Semibold,19,&H00BDCCC0,&H00BDCCC0,&H0007110D,&H8007110D,-1,0,0,0,100,100,0.7,0,1,0.6,0,7,0,0,0,1
+Style: URL,Segoe UI Semibold,22,&H00B4E670,&H00B4E670,&H0007110D,&H8007110D,-1,0,0,0,100,100,0.5,0,1,0.6,0,9,0,0,0,1
+
+[Events]
+Format: Layer, Start, End, Style, Name, MarginL, MarginR, MarginV, Effect, Text
+; Product name and proof panel are present with footage from the first frame.
+Dialogue: 2,0:00:00.00,0:00:14.56,Brand,,0,0,0,,{\pos(88,54)\fad(100,210)}PROMPT REWRITER
+Dialogue: 2,0:00:00.00,0:00:14.56,Kicker,,0,0,0,,{\pos(1830,66)\an9\fad(100,210)}FROM ROUGH TEXT TO A CLEAR PROMPT
+Dialogue: 2,0:00:00.00,0:00:14.56,ProofHead,,0,0,0,,{\pos(1252,193)\fad(100,210)}THE ACTUAL RECORDING
+Dialogue: 2,0:00:00.00,0:00:14.56,Proof,,0,0,0,,{\pos(1252,238)\fad(100,210)}Notepad capture  /  same active field
+Dialogue: 2,0:00:00.00,0:00:14.56,Proof,,0,0,0,,{\pos(1252,690)\fad(100,210)}The inset shows the recorded desktop run.
+Dialogue: 2,0:00:00.00,0:00:14.56,Proof,,0,0,0,,{\pos(1252,728)\fad(100,210)}The full real-time sequence is a separate video.
+Dialogue: 2,0:00:00.00,0:00:14.56,Footer,,0,0,0,,{\pos(88,985)\fad(100,210)}EDITED TRAILER  /  TIMING COMPRESSED FOR THE EDIT
+Dialogue: 2,0:00:00.00,0:00:14.56,URL,,0,0,0,,{\pos(1832,983)\fad(100,210)}github.com/Zinga18018/prompt-rewriter
+
+; Scene 1: exact rough request in the recording, with editorial line breaks.
+Dialogue: 3,0:00:00.00,0:00:02.82,Kicker,,0,0,0,,{\pos(128,193)\fad(120,160)}01  /  ORIGINAL REQUEST
+Dialogue: 3,0:00:00.13,0:00:02.82,Input,,0,0,0,,{\move(130,292,130,278,0,450)\fad(160,180)}make me a 4-week Python plan\Nfor data science; I am a beginner,\Ncan study 45 minutes a day, and\Nwant one mini-project each week
+Dialogue: 3,0:00:00.29,0:00:02.80,Proof,,0,0,0,,{\pos(130,755)\fad(160,180)}Original wording from the captured request.
+Dialogue: 3,0:00:00.22,0:00:02.82,Status,,0,0,0,,{\pos(1252,645)\fad(160,180)}ROUGH INPUT
+
+; Scene 2: shortcut cue; the inset shows selection from the original video.
+Dialogue: 3,0:00:02.91,0:00:05.32,Kicker,,0,0,0,,{\pos(128,193)\fad(130,170)}02  /  IN THE ACTIVE WINDOW
+Dialogue: 3,0:00:03.00,0:00:05.30,Action,,0,0,0,,{\move(130,310,130,294,0,420)\fad(140,160)}SELECT TEXT
+Dialogue: 3,0:00:03.15,0:00:05.30,Action,,0,0,0,,{\move(130,425,130,409,0,420)\fad(140,160)}PRESS YOUR HOTKEY
+Dialogue: 3,0:00:03.37,0:00:05.30,Proof,,0,0,0,,{\pos(130,680)\fad(140,160)}The selected text is visible in the recording.
+Dialogue: 3,0:00:02.99,0:00:05.32,Status,,0,0,0,,{\pos(1252,645)\fad(130,170)}TEXT SELECTED
+
+; Scene 3: exact five-field result transcribed from the captured screen.
+Dialogue: 3,0:00:05.43,0:00:14.54,Kicker,,0,0,0,,{\pos(128,186)\fad(130,210)}03  /  RESULT IN THE SAME FIELD
+Dialogue: 3,0:00:05.51,0:00:14.54,Label,,0,0,0,,{\pos(130,235)\fad(150,210)}ROLE
+Dialogue: 3,0:00:05.62,0:00:14.54,Value,,0,0,0,,{\pos(130,270)\fad(150,210)}Data Science Educator
+Dialogue: 3,0:00:06.20,0:00:14.54,Label,,0,0,0,,{\pos(130,363)\fad(150,210)}CONTEXT
+Dialogue: 3,0:00:06.31,0:00:14.54,Value,,0,0,0,,{\pos(130,397)\fad(150,210)}Beginner
+Dialogue: 3,0:00:06.80,0:00:14.54,Label,,0,0,0,,{\pos(130,466)\fad(150,210)}CONCRETE TASK
+Dialogue: 3,0:00:06.91,0:00:14.54,Task,,0,0,0,,{\pos(130,500)\fad(150,210)}Create a 4-week Python plan for data science,\Ntailored for a beginner studying 45 minutes a day,\Nwith one mini-project per week
+Dialogue: 3,0:00:08.00,0:00:14.54,Label,,0,0,0,,{\pos(130,651)\fad(150,210)}CONSTRAINTS
+Dialogue: 3,0:00:08.11,0:00:14.54,Task,,0,0,0,,{\pos(130,686)\fad(150,210)}Use only supplied facts; state assumptions explicitly
+Dialogue: 3,0:00:08.80,0:00:14.54,Label,,0,0,0,,{\pos(130,765)\fad(150,210)}OUTPUT FORMAT
+Dialogue: 3,0:00:08.91,0:00:14.54,Task,,0,0,0,,{\pos(130,800)\fad(150,210)}Weekly plan with project details and study schedule
+Dialogue: 3,0:00:05.48,0:00:14.54,Status,,0,0,0,,{\pos(1252,645)\fad(160,210)}RESULT PASTED

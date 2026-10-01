@@ -11,14 +11,16 @@ Prompt Rewriter is a Windows-first Python desktop tool. Select text in an editab
 > **Project status:** tested MVP for learning and portfolio use. It is not production-ready and
 > should not be trusted with sensitive text or irreplaceable clipboard contents.
 
-[![Prompt Rewriter cinematic demo](assets/prompt-rewriter-poster.png)](assets/prompt-rewriter-cinematic.mp4)
+[![Prompt Rewriter trailer](assets/prompt-rewriter-trailer-poster.png)](assets/prompt-rewriter-trailer.mp4)
 
-**[Watch the full cinematic demo](assets/prompt-rewriter-cinematic.mp4)**
+**[Watch the cinematic trailer](assets/prompt-rewriter-trailer.mp4)** ·
+**[Watch the continuous live demo](assets/prompt-rewriter-live-demo.mp4)**
 
-![Short Prompt Rewriter preview](assets/prompt-rewriter-preview.gif)
-
-The recorded demo uses the local Ollama route. It shows one real run, not a universal latency
-benchmark; model speed varies with hardware, model state, input length, and provider conditions.
+Both videos use one recorded Notepad run with the local Ollama route. The trailer is edited for
+pacing and adds visual labels; the live demo preserves the recorded wait from text selection to
+replacement. Neither video is a universal latency or cross-application compatibility benchmark.
+The rendering script uses a local source recording (`prompt-rewriter-capture-v2.mp4`) that is
+intentionally excluded from Git; the finished videos above are included in this repository.
 
 ## What it does
 
