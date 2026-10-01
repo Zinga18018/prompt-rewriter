@@ -68,11 +68,15 @@ class FakeInput:
     def __init__(self, clipboard: FakeClipboard):
         self._clipboard = clipboard
         self.copy_calls = 0
+        self.select_all_calls = 0
         self.paste_calls = 0
 
     def copy(self) -> None:
         self.copy_calls += 1
         self._clipboard.copy_selection()
+
+    def select_all(self) -> None:
+        self.select_all_calls += 1
 
     def paste(self) -> None:
         self.paste_calls += 1

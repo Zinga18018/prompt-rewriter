@@ -4,6 +4,7 @@ import logging
 
 from prompt_rewriter.config import Settings
 from prompt_rewriter.errors import ConfigurationError
+from prompt_rewriter.providers.gemini_provider import GeminiProvider
 from prompt_rewriter.providers.groq_provider import GroqProvider
 from prompt_rewriter.providers.ollama_provider import OllamaProvider
 from prompt_rewriter.providers.router import FallbackRouter
@@ -14,7 +15,21 @@ logger = logging.getLogger(__name__)
 def build_router(settings: Settings) -> FallbackRouter:
     providers = []
     for provider_name in settings.provider_order:
-        if provider_name == "groq":
+        if provider_name == "gemini":
+            if not settings.gemini_api_key:
+                logger.info("Skipping Gemini because GEMINI_API_KEY is not configured")
+                continue
+            providers.append(
+                GeminiProvider(
+                    api_key=settings.gemini_api_key,
+                    model=settings.gemini_model,
+                    timeout_seconds=settings.gemini_timeout_seconds,
+                    max_tokens=settings.gemini_max_tokens,
+                    max_output_chars=settings.max_output_chars,
+                    base_url=settings.gemini_base_url,
+                )
+            )
+        elif provider_name == "groq":
             if not settings.groq_api_key:
                 logger.info("Skipping Groq because GROQ_API_KEY is not configured")
                 continue
@@ -42,7 +57,7 @@ def build_router(settings: Settings) -> FallbackRouter:
 
     if not providers:
         raise ConfigurationError(
-            "No usable provider is configured. Add GROQ_API_KEY or include ollama in "
-            "PROMPT_REWRITER_PROVIDER_ORDER."
+            "No usable provider is configured. Add GEMINI_API_KEY or GROQ_API_KEY, "
+            "or include ollama in PROMPT_REWRITER_PROVIDER_ORDER."
         )
     return FallbackRouter(tuple(providers))

@@ -10,13 +10,16 @@ def test_settings_from_env_parses_and_normalizes_values() -> None:
     settings = Settings.from_env(
         {
             "PROMPT_REWRITER_HOTKEY": "alt+space",
-            "PROMPT_REWRITER_PROVIDER_ORDER": " Ollama, Groq ",
+            "PROMPT_REWRITER_PROVIDER_ORDER": " Gemini, Ollama, Groq ",
             "PROMPT_REWRITER_COPY_TIMEOUT_SECONDS": "2.5",
             "PROMPT_REWRITER_PASTE_SETTLE_SECONDS": "0",
             "PROMPT_REWRITER_RESTORE_CLIPBOARD": "off",
             "PROMPT_REWRITER_MAX_INPUT_CHARS": "321",
             "PROMPT_REWRITER_MAX_OUTPUT_CHARS": "654",
             "PROMPT_REWRITER_LOG_LEVEL": "debug",
+            "GEMINI_API_KEY": "  gemini-secret  ",
+            "GEMINI_MODEL": "gemini-3.5-flash-lite",
+            "GEMINI_BASE_URL": "https://generativelanguage.googleapis.com/v1beta/",
             "GROQ_API_KEY": "  secret  ",
             "GROQ_BASE_URL": "https://api.groq.com/openai/v1/",
             "OLLAMA_URL": "http://127.0.0.1:11434/",
@@ -24,16 +27,21 @@ def test_settings_from_env_parses_and_normalizes_values() -> None:
     )
 
     assert settings.hotkey == "alt+space"
-    assert settings.provider_order == ("ollama", "groq")
+    assert settings.provider_order == ("gemini", "ollama", "groq")
     assert settings.copy_timeout_seconds == 2.5
     assert settings.paste_settle_seconds == 0
     assert settings.restore_clipboard is False
     assert settings.max_input_chars == 321
     assert settings.max_output_chars == 654
     assert settings.log_level == "DEBUG"
+    assert settings.gemini_api_key == "gemini-secret"
+    assert settings.gemini_model == "gemini-3.5-flash-lite"
+    assert settings.gemini_base_url == "https://generativelanguage.googleapis.com/v1beta"
     assert settings.groq_api_key == "secret"
     assert settings.groq_base_url == "https://api.groq.com/openai/v1"
     assert settings.ollama_url == "http://127.0.0.1:11434"
+    assert "gemini-secret" not in repr(settings)
+    assert "secret" not in repr(settings)
 
 
 @pytest.mark.parametrize(
@@ -58,6 +66,13 @@ def test_settings_from_env_parses_and_normalizes_values() -> None:
         ({"GROQ_BASE_URL": "http://api.groq.com/v1"}, "not a valid"),
         ({"GROQ_BASE_URL": "https://groq.test/v1"}, "official provider host"),
         ({"GROQ_BASE_URL": "https://groq.test:notaport/v1"}, "invalid port"),
+        ({"GEMINI_BASE_URL": "http://generativelanguage.googleapis.com/v1beta"}, "not a valid"),
+        ({"GEMINI_BASE_URL": "https://example.com/v1beta"}, "official provider host"),
+        (
+            {"GEMINI_BASE_URL": "https://generativelanguage.googleapis.com/v1"},
+            "official /v1beta",
+        ),
+        ({"GEMINI_MODEL": "gemini/model?key=x"}, "unsupported characters"),
     ],
 )
 def test_settings_from_env_rejects_invalid_values(

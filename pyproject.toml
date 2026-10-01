@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "prompt-rewriter"
 version = "0.1.0"
-description = "Windows global-hotkey prompt rewriter with Groq and Ollama fallback."
+description = "Windows global-hotkey prompt rewriter with Gemini, Groq, and Ollama routing."
 readme = "README.md"
 requires-python = ">=3.10"
 authors = [
@@ -13,6 +13,7 @@ authors = [
 ]
 keywords = [
   "desktop-automation",
+  "gemini",
   "groq",
   "ollama",
   "prompt-engineering",
@@ -36,6 +37,7 @@ dependencies = [
   "keyboard>=0.13.5,<0.14",
   "pyperclip>=1.9.0,<2",
   "python-dotenv>=1.0.1,<2",
+  "uiautomation>=2.0.29,<3",
 ]
 
 [project.optional-dependencies]

@@ -2,15 +2,16 @@ from __future__ import annotations
 
 import math
 import os
+import re
 from collections.abc import Mapping
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from urllib.parse import urlparse
 
 from dotenv import load_dotenv
 
 from prompt_rewriter.errors import ConfigurationError
 
-_PROVIDERS = {"groq", "ollama"}
+_PROVIDERS = {"gemini", "groq", "ollama"}
 _LOG_LEVELS = {"DEBUG", "INFO", "WARNING", "ERROR", "CRITICAL"}
 
 
@@ -96,6 +97,7 @@ def _validate_base_url(
 
 
 def _provider_order(source: Mapping[str, str]) -> tuple[str, ...]:
+    # Preserve the existing route unless the user explicitly opts Gemini in.
     raw = source.get("PROMPT_REWRITER_PROVIDER_ORDER", "groq,ollama")
     values = tuple(part.strip().lower() for part in raw.split(",") if part.strip())
     if not values:
@@ -106,6 +108,13 @@ def _provider_order(source: Mapping[str, str]) -> tuple[str, ...]:
     if len(values) != len(set(values)):
         raise ConfigurationError("PROMPT_REWRITER_PROVIDER_ORDER contains duplicates")
     return values
+
+
+def _gemini_model(source: Mapping[str, str]) -> str:
+    model = _nonempty_text(source, "GEMINI_MODEL", "gemini-3.5-flash-lite")
+    if re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,127}", model) is None:
+        raise ConfigurationError("GEMINI_MODEL contains unsupported characters")
+    return model
 
 
 @dataclass(frozen=True, slots=True)
@@ -120,7 +129,12 @@ class Settings:
     max_input_chars: int
     max_output_chars: int
     log_level: str
-    groq_api_key: str | None
+    gemini_api_key: str | None = field(repr=False)
+    gemini_model: str
+    gemini_timeout_seconds: float
+    gemini_max_tokens: int
+    gemini_base_url: str
+    groq_api_key: str | None = field(repr=False)
     groq_model: str
     groq_timeout_seconds: float
     groq_max_tokens: int
@@ -145,8 +159,14 @@ class Settings:
                 "PROMPT_REWRITER_LOG_LEVEL must be one of " + ", ".join(sorted(_LOG_LEVELS))
             )
 
+        gemini_key = source.get("GEMINI_API_KEY", "").strip() or None
         groq_key = source.get("GROQ_API_KEY", "").strip() or None
         ollama_url = _nonempty_text(source, "OLLAMA_URL", "http://127.0.0.1:11434")
+        gemini_base_url = _nonempty_text(
+            source,
+            "GEMINI_BASE_URL",
+            "https://generativelanguage.googleapis.com/v1beta",
+        )
         groq_base_url = _nonempty_text(source, "GROQ_BASE_URL", "https://api.groq.com/openai/v1")
         ollama_url = _validate_base_url(
             "OLLAMA_URL",
@@ -161,6 +181,14 @@ class Settings:
             allowed_schemes={"https"},
             allowed_hosts={"api.groq.com"},
         )
+        gemini_base_url = _validate_base_url(
+            "GEMINI_BASE_URL",
+            gemini_base_url,
+            allowed_schemes={"https"},
+            allowed_hosts={"generativelanguage.googleapis.com"},
+        )
+        if urlparse(gemini_base_url).path != "/v1beta":
+            raise ConfigurationError("GEMINI_BASE_URL must use the official /v1beta API path")
 
         return cls(
             hotkey=_nonempty_text(source, "PROMPT_REWRITER_HOTKEY", "ctrl+shift+space"),
@@ -168,7 +196,7 @@ class Settings:
             copy_chord=_nonempty_text(source, "PROMPT_REWRITER_COPY_CHORD", "ctrl+c"),
             paste_chord=_nonempty_text(source, "PROMPT_REWRITER_PASTE_CHORD", "ctrl+v"),
             copy_timeout_seconds=_positive_float(
-                source, "PROMPT_REWRITER_COPY_TIMEOUT_SECONDS", 1.0
+                source, "PROMPT_REWRITER_COPY_TIMEOUT_SECONDS", 0.35
             ),
             paste_settle_seconds=_nonnegative_float(
                 source, "PROMPT_REWRITER_PASTE_SETTLE_SECONDS", 0.25
@@ -177,6 +205,11 @@ class Settings:
             max_input_chars=_positive_int(source, "PROMPT_REWRITER_MAX_INPUT_CHARS", 12_000),
             max_output_chars=_positive_int(source, "PROMPT_REWRITER_MAX_OUTPUT_CHARS", 16_000),
             log_level=log_level,
+            gemini_api_key=gemini_key,
+            gemini_model=_gemini_model(source),
+            gemini_timeout_seconds=_positive_float(source, "GEMINI_TIMEOUT_SECONDS", 6.0),
+            gemini_max_tokens=_positive_int(source, "GEMINI_MAX_TOKENS", 650),
+            gemini_base_url=gemini_base_url,
             groq_api_key=groq_key,
             groq_model=_nonempty_text(source, "GROQ_MODEL", "openai/gpt-oss-20b"),
             groq_timeout_seconds=_positive_float(source, "GROQ_TIMEOUT_SECONDS", 4.0),

@@ -40,13 +40,28 @@ class HotkeyDaemon:
                 logger.warning("Hotkey remained pressed; rewrite cancelled")
                 return
             outcome = self._workflow.run(origin_context)
-            log = logger.info if outcome.status == WorkflowStatus.SUCCESS else logger.warning
+            log = (
+                logger.info
+                if outcome.status in {WorkflowStatus.SUCCESS, WorkflowStatus.ALREADY_STRUCTURED}
+                else logger.warning
+            )
             log("%s", outcome.message)
         finally:
             self._dispatch_lock.release()
 
-    def _wait_for_hotkey_release(self, timeout_seconds: float = 1.5) -> bool:
-        """Avoid turning synthetic Ctrl+C into Ctrl+Shift+C through modifier bleed."""
+    def _wait_for_hotkey_release(
+        self,
+        timeout_seconds: float = 1.5,
+        stable_release_seconds: float = 0.075,
+        poll_seconds: float = 0.01,
+    ) -> bool:
+        """Wait for a stable release before injecting copy into the target app.
+
+        ``keyboard.is_pressed`` changes state before the low-level hook has always
+        finished processing the physical key-up event. Chromium/Electron editors
+        can miss an immediate synthetic Ctrl+C in that small window, so require a
+        short continuously released interval rather than one released observation.
+        """
         try:
             parsed = keyboard.parse_hotkey(self._hotkey)
             scan_codes = {
@@ -60,11 +75,20 @@ class HotkeyDaemon:
             return False
 
         deadline = time.monotonic() + timeout_seconds
-        while any(keyboard.is_pressed(scan_code) for scan_code in scan_codes):
-            if time.monotonic() >= deadline:
+        release_started: float | None = None
+        while True:
+            now = time.monotonic()
+            pressed = any(keyboard.is_pressed(scan_code) for scan_code in scan_codes)
+            if pressed:
+                release_started = None
+            elif release_started is None:
+                release_started = now
+            elif now - release_started >= stable_release_seconds:
+                return True
+
+            if now >= deadline:
                 return False
-            time.sleep(0.01)
-        return True
+            time.sleep(min(poll_seconds, max(0.0, deadline - now)))
 
     def run_forever(self) -> None:
         try:
@@ -73,7 +97,7 @@ class HotkeyDaemon:
                 self._on_hotkey,
                 # Do not let the target app interpret the chord and alter the selection.
                 suppress=True,
-                trigger_on_release=False,
+                trigger_on_release=True,
             )
         except (KeyError, ValueError, OSError, RuntimeError) as exc:
             raise DesktopIntegrationError(

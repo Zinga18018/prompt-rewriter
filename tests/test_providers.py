@@ -5,7 +5,10 @@ from types import SimpleNamespace
 from typing import Any
 
 import httpx
+import pytest
 
+from prompt_rewriter.errors import InferenceError
+from prompt_rewriter.providers.gemini_provider import GeminiProvider
 from prompt_rewriter.providers.groq_provider import GroqProvider
 from prompt_rewriter.providers.ollama_provider import OllamaProvider
 
@@ -49,6 +52,124 @@ class FakeGroqClient:
     def __init__(self) -> None:
         self.completions = FakeGroqCompletions()
         self.chat = SimpleNamespace(completions=self.completions)
+
+
+def test_gemini_provider_uses_header_and_structured_generate_contract() -> None:
+    captured: dict[str, Any] = {}
+
+    def handler(request: httpx.Request) -> httpx.Response:
+        captured["url"] = str(request.url)
+        captured["api_key"] = request.headers.get("x-goog-api-key")
+        captured["payload"] = json.loads(request.content)
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "steps": [
+                    {
+                        "type": "model_output",
+                        "content": [{"type": "text", "text": STRUCTURED_RESPONSE}],
+                    }
+                ]
+            },
+        )
+
+    client = httpx.Client(
+        base_url="https://generativelanguage.googleapis.com/v1beta",
+        transport=httpx.MockTransport(handler),
+    )
+    provider = GeminiProvider(
+        api_key="not-used-by-fake",
+        model="gemini-3.5-flash-lite",
+        timeout_seconds=6.0,
+        max_tokens=650,
+        max_output_chars=2_000,
+        base_url="https://generativelanguage.googleapis.com/v1beta",
+        client=client,
+    )
+
+    result = provider.rewrite("make this better")
+
+    assert result.text == EXPECTED_OUTPUT
+    assert result.provider == "gemini"
+    assert result.model == "gemini-3.5-flash-lite"
+    assert captured["api_key"] == "not-used-by-fake"
+    assert "not-used-by-fake" not in captured["url"]
+    assert captured["url"].endswith("/v1beta/interactions")
+    payload = captured["payload"]
+    assert payload["model"] == "gemini-3.5-flash-lite"
+    assert payload["system_instruction"]
+    assert payload["input"]
+    assert payload["store"] is False
+    config = payload["generation_config"]
+    assert config["max_output_tokens"] == 650
+    assert config["thinking_level"] == "minimal"
+    response_format = payload["response_format"]
+    assert response_format["type"] == "text"
+    assert response_format["mime_type"] == "application/json"
+    assert response_format["schema"]["additionalProperties"] is False
+
+
+def test_gemini_provider_ignores_thought_parts() -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            200,
+            json={
+                "status": "completed",
+                "steps": [
+                    {
+                        "type": "thought",
+                        "content": [{"type": "text", "text": "private reasoning"}],
+                    },
+                    {
+                        "type": "model_output",
+                        "content": [{"type": "text", "text": STRUCTURED_RESPONSE}],
+                    }
+                ]
+            },
+        )
+
+    provider = GeminiProvider(
+        api_key="not-used-by-fake",
+        model="gemini-3.5-flash-lite",
+        timeout_seconds=6.0,
+        max_tokens=650,
+        max_output_chars=2_000,
+        base_url="https://generativelanguage.googleapis.com/v1beta",
+        client=httpx.Client(
+            base_url="https://generativelanguage.googleapis.com/v1beta",
+            transport=httpx.MockTransport(handler),
+        ),
+    )
+
+    assert provider.rewrite("make this better").text == EXPECTED_OUTPUT
+
+
+def test_gemini_provider_sanitizes_api_errors() -> None:
+    def handler(_request: httpx.Request) -> httpx.Response:
+        return httpx.Response(
+            403,
+            json={"error": {"message": "PRIVATE PROVIDER DETAIL"}},
+        )
+
+    provider = GeminiProvider(
+        api_key="PRIVATE API KEY",
+        model="gemini-3.5-flash-lite",
+        timeout_seconds=6.0,
+        max_tokens=650,
+        max_output_chars=2_000,
+        base_url="https://generativelanguage.googleapis.com/v1beta",
+        client=httpx.Client(
+            base_url="https://generativelanguage.googleapis.com/v1beta",
+            transport=httpx.MockTransport(handler),
+        ),
+    )
+
+    with pytest.raises(InferenceError) as raised:
+        provider.rewrite("make this better")
+
+    assert "HTTP 403" in str(raised.value)
+    assert "PRIVATE" not in str(raised.value)
 
 
 def test_groq_provider_builds_latency_bounded_structured_request() -> None:
@@ -124,4 +245,4 @@ def test_ollama_provider_uses_nonstreaming_generate_contract() -> None:
     assert captured["stream"] is False
     assert captured["format"]["additionalProperties"] is False
     assert captured["keep_alive"] == "10m"
-    assert captured["options"] == {"temperature": 0.1, "num_predict": 650}
+    assert captured["options"] == {"temperature": 0, "seed": 42, "num_predict": 650}

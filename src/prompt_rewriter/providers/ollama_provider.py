@@ -50,7 +50,11 @@ class OllamaProvider:
             "stream": False,
             "format": PROMPT_REWRITE_SCHEMA,
             "keep_alive": self._keep_alive,
-            "options": {"temperature": 0.1, "num_predict": self._max_tokens},
+            "options": {
+                "temperature": 0,
+                "seed": 42,
+                "num_predict": self._max_tokens,
+            },
         }
         try:
             response = self._client.post("/api/generate", json=payload)

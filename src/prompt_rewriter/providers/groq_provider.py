@@ -47,7 +47,7 @@ class GroqProvider:
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {"role": "user", "content": build_user_message(rough_text)},
             ],
-            "temperature": 0.1,
+            "temperature": 0,
             "max_completion_tokens": self._max_tokens,
             "stream": False,
         }

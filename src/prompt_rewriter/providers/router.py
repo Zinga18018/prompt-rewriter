@@ -34,7 +34,11 @@ class FallbackRouter:
                     provider.name, f"unexpected provider error ({type(exc).__name__})"
                 )
                 failures.append(failure)
-                logger.exception("Unexpected provider error from %s", provider.name)
+                logger.warning(
+                    "Unexpected provider error from %s (%s)",
+                    provider.name,
+                    type(exc).__name__,
+                )
                 continue
 
             logger.info(
@@ -50,5 +54,9 @@ class FallbackRouter:
         for provider in self._providers:
             try:
                 provider.close()
-            except Exception:
-                logger.exception("Failed to close provider %s", provider.name)
+            except Exception as exc:
+                logger.warning(
+                    "Failed to close provider %s (%s)",
+                    provider.name,
+                    type(exc).__name__,
+                )

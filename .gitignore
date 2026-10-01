@@ -1,5 +1,6 @@
 .venv/
-.env
+.env*
+!.env.example
 __pycache__/
 *.py[cod]
 .pytest_cache/
@@ -20,4 +21,4 @@ dist/
 /prompt-rewriter-transition-contact-sheet.png
 /prompt-rewriter-v2-contact.png
 /prompt-rewriter-v2-transition.png
-/*.log
+*.log

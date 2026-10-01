@@ -5,7 +5,12 @@ import json
 import pytest
 
 from prompt_rewriter.errors import OutputValidationError
-from prompt_rewriter.prompts import SYSTEM_PROMPT, build_user_message, clean_and_validate_output
+from prompt_rewriter.prompts import (
+    SYSTEM_PROMPT,
+    build_user_message,
+    clean_and_validate_output,
+    is_structured_prompt,
+)
 
 VALID_PAYLOAD = {
     "role": "Senior engineer",
@@ -40,10 +45,27 @@ def test_build_user_message_preserves_untrusted_text_as_json_data() -> None:
     assert json.loads(payload) == {"rough_input": rough_text}
 
 
-def test_system_prompt_forbids_template_placeholders_and_internal_json_as_user_format() -> None:
-    placeholder_rule = 'Never emit ellipses or template placeholders such as\n  "[Clarify: ...]"'
-    assert placeholder_rule in SYSTEM_PROMPT
-    assert 'Do not say\n  "JSON object"' in SYSTEM_PROMPT
+@pytest.mark.parametrize(
+    "text",
+    [
+        VALID_OUTPUT,
+        VALID_OUTPUT.replace("\n", "\\\n"),
+    ],
+)
+def test_is_structured_prompt_recognizes_generated_and_accessibility_forms(text: str) -> None:
+    assert is_structured_prompt(text)
+
+
+def test_is_structured_prompt_rejects_rough_or_incomplete_text() -> None:
+    assert not is_structured_prompt("I want to create a neat website")
+    assert not is_structured_prompt("Role:\nDesigner\n\nContext:\nA website")
+
+
+def test_system_prompt_requires_literal_fidelity_and_neutral_default_format() -> None:
+    assert "do not creatively complete it" in SYSTEM_PROMPT
+    assert "deliverable that the user did not state" in SYSTEM_PROMPT
+    assert "If details are missing, say they are unspecified instead of guessing" in SYSTEM_PROMPT
+    assert "Provide a concise, actionable response with" in SYSTEM_PROMPT
 
 
 def test_clean_and_validate_output_renders_fixed_section_order() -> None:

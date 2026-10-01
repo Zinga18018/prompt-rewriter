@@ -25,6 +25,7 @@ benchmark; model speed varies with hardware, model state, input length, and prov
 1. Listens for a global `Ctrl+Shift+Space` hotkey.
 2. Copies the currently selected text and rejects an empty or oversized selection.
 3. Sends the text through the configured provider route:
+   - Gemini Flash-Lite for low-latency cloud inference when explicitly enabled.
    - Groq for cloud inference when a key is configured.
    - Ollama for local inference or fallback.
 4. Validates a strict five-field response before it can reach the clipboard.
@@ -66,7 +67,7 @@ The interesting part is the boundary between desktop automation and nondetermini
 
 - The hotkey callback schedules work on one background worker, so the listener stays responsive and
   repeated triggers cannot overlap.
-- Both providers receive the same JSON schema. The app rejects missing or extra fields, duplicate
+- All configured providers receive the same JSON schema. The app rejects missing or extra fields, duplicate
   keys, wrappers, filler, and malformed output, then renders the final text locally.
 - Provider failures are bounded and isolated. The router attempts each configured provider once and
   returns a clean failure when none succeed.
@@ -86,9 +87,9 @@ single background worker
 copy + selection validation
        |
        v
-Groq  -------- failure -------->  Ollama
-       |                              |
-       +------------ result ----------+
+Gemini  ---- failure ---->  Groq  ---- failure ---->  Ollama
+   |                         |                            |
+   +-------------------------+----------- result --------+
                      |
                      v
 strict five-field validation
@@ -104,7 +105,7 @@ paste + best-effort text restoration
 | --- | --- |
 | `config.py` | Environment parsing, defaults, limits, and provider order |
 | `prompts.py` | Rewrite contract, JSON schema, validation, and final rendering |
-| `providers/` | Groq client, Ollama client, and fallback router |
+| `providers/` | Gemini, Groq, and Ollama clients plus the fallback router |
 | `windows_io.py` | Windows keyboard, clipboard, focus, and input checks |
 | `workflow.py` | Guarded copy-infer-paste transaction |
 | `daemon.py` | Global hotkey and serialized background execution |
@@ -117,7 +118,7 @@ Requirements:
 - Windows 10 or 11
 - Python 3.10 or newer
 - An editable field where normal `Ctrl+C` and `Ctrl+V` work
-- [Ollama for Windows](https://ollama.com/download/windows), a Groq API key, or both
+- [Ollama for Windows](https://ollama.com/download/windows), a Gemini/Groq API key, or both
 
 Open PowerShell in the repository:
 
@@ -163,7 +164,7 @@ Add a Groq key to `.env`:
 
 ```dotenv
 PROMPT_REWRITER_PROVIDER_ORDER=groq,ollama
-GROQ_API_KEY=gsk_your_key_here
+GROQ_API_KEY=
 GROQ_MODEL=openai/gpt-oss-20b
 ```
 
@@ -171,6 +172,24 @@ Provider availability changes over time, so confirm model access in the
 [Groq model documentation](https://console.groq.com/docs/models). When Groq is first in the route,
 selected text is sent to Groq. Use `PROMPT_REWRITER_PROVIDER_ORDER=ollama` when text must stay on the
 local machine.
+
+### Optional Gemini cloud route
+
+First, create a new private key in Google AI Studio. If a key has appeared in a chat, log, commit,
+or screenshot, revoke it and create another one before continuing. Put only the replacement key in
+the ignored local `.env` file:
+
+```dotenv
+PROMPT_REWRITER_PROVIDER_ORDER=gemini,ollama
+GEMINI_API_KEY=
+GEMINI_MODEL=gemini-3.5-flash-lite
+```
+
+The Gemini request uses the API-key header rather than putting the credential in the URL. It uses
+the current Interactions API with storage explicitly disabled. The default model is the stable
+Flash-Lite model selected for low-latency structured rewriting. When Gemini fails or times out, the
+existing router tries Ollama once. Selected text leaves the computer whenever Gemini is first in
+the configured route.
 
 ### Run the hotkey listener
 
@@ -195,11 +214,12 @@ The annotated defaults live in [`.env.example`](.env.example). The most useful c
 
 | Setting | Purpose |
 | --- | --- |
-| `PROMPT_REWRITER_PROVIDER_ORDER` | Comma-separated fallback order: `groq,ollama`, `ollama`, or `groq` |
+| `PROMPT_REWRITER_PROVIDER_ORDER` | Comma-separated fallback order using `gemini`, `groq`, and/or `ollama` |
 | `PROMPT_REWRITER_HOTKEY` | Global trigger; defaults to `ctrl+shift+space` |
 | `PROMPT_REWRITER_MAX_INPUT_CHARS` | Rejects unexpectedly large selections before inference |
-| `PROMPT_REWRITER_COPY_TIMEOUT_SECONDS` | Maximum wait for selected text to reach the clipboard |
+| `PROMPT_REWRITER_COPY_TIMEOUT_SECONDS` | Maximum clipboard-copy wait before the UIA fallback (default `0.35`) |
 | `PROMPT_REWRITER_RESTORE_CLIPBOARD` | Restores the prior plain-text value after a successful paste when safe |
+| `GEMINI_TIMEOUT_SECONDS` | Gemini request time limit before fallback |
 | `GROQ_TIMEOUT_SECONDS` | Cloud request time limit before fallback |
 | `OLLAMA_TIMEOUT_SECONDS` | Local request time limit |
 | `OLLAMA_KEEP_ALIVE` | How long Ollama keeps the model loaded |
@@ -214,7 +234,8 @@ python -m prompt_rewriter --doctor
 ## Safety and privacy boundaries
 
 - **Cloud routing sends selected text off-device.** Never select passwords, API keys, protected
-  health information, confidential client data, or other sensitive material when Groq is enabled.
+  health information, confidential client data, or other sensitive material when Gemini or Groq
+  is enabled.
 - **Clipboard recovery is plain-text and best effort.** Rich formats such as images, files, HTML,
   or application-specific objects are not preserved. The app refuses to start the transaction when
   the clipboard contains only non-text data.
@@ -232,12 +253,15 @@ See [SECURITY.md](SECURITY.md) for the threat boundary and responsible reporting
 
 ## Verified status
 
-Current workspace verification on **September 26, 2026**:
+Current workspace verification on **September 30, 2026**:
 
-- `60` automated tests collected and passed.
+- The automated test suite passes locally.
 - `python -m pip check` reported no broken requirements.
 - A local Ollama rewrite and a full Notepad copy-rewrite-paste flow completed successfully for the
   recorded demo.
+- The Gemini adapter, schema, routing, error sanitization, and diagnostics are verified with mocked
+  API responses. No live Gemini request was made with the exposed credential; live verification
+  remains pending until a newly rotated key is configured locally.
 
 The automated suite uses controlled fakes for provider and desktop edge cases. One successful
 Notepad run does not prove compatibility with every Windows application.
@@ -275,8 +299,8 @@ For follow-on portfolio builds that reuse this architecture, see
 ## Troubleshooting
 
 **No usable provider:** run `python -m prompt_rewriter --doctor`. For Ollama, confirm
-`ollama list` contains the configured model. For Groq, confirm the key and model are available to the
-account.
+`ollama list` contains the configured model. For Gemini or Groq, confirm the replacement private
+key and configured model are available to the account.
 
 **The hotkey does nothing:** verify `--rewrite` first, then test a clearly highlighted selection in
 Notepad. Check for a shortcut conflict and keep the tool at the same privilege level as the target.

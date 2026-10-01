@@ -24,9 +24,9 @@ provider risks.
 - Pressing the hotkey intentionally copies the current selection through the Windows global
   clipboard. Other software with clipboard access, including clipboard history and clipboard
   managers, may observe that text.
-- With Groq enabled, selected text is sent to Groq over the network. Use Ollama-only mode for text
-  that must stay on the machine, while recognizing that local software and the operating system can
-  still access the clipboard.
+- With Gemini or Groq enabled, selected text is sent to that provider over the network. Use
+  Ollama-only mode for text that must stay on the machine, while recognizing that local software
+  and the operating system can still access the clipboard.
 - Clipboard recovery is plain-text, best effort. Rich formats are not preserved, and another
   program can race with the transaction. The code checks Windows clipboard sequence numbers and
   avoids overwriting a newer detectable clipboard value.
@@ -44,3 +44,6 @@ data unless the entire configured path is appropriate for that data.
 
 Keep `.env` out of source control. If a key is exposed, revoke it with the provider immediately,
 replace it locally, and remove it from published Git history before continuing to use the repository.
+Provider keys are sent in request headers and must never be placed in URLs or logged.
+Gemini interactions set `store: false`; this does not override any separate provider-side logging,
+abuse-monitoring, billing, or account policies.

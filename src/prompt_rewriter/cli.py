@@ -16,6 +16,7 @@ from prompt_rewriter.single_instance import WindowsSingleInstance
 from prompt_rewriter.windows_io import (
     WindowsClipboard,
     WindowsKeyboard,
+    WindowsUIASelection,
     WindowsWindowTracker,
     validate_keyboard_chord,
 )
@@ -77,6 +78,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             input_driver=WindowsKeyboard(settings.copy_chord, settings.paste_chord),
             windows=WindowsWindowTracker(),
             rewriter=router,
+            selection_reader=WindowsUIASelection(),
         )
         with WindowsSingleInstance():
             HotkeyDaemon(settings.hotkey, workflow).run_forever()

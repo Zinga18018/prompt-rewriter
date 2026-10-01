@@ -48,6 +48,27 @@ def test_router_falls_back_after_expected_provider_failure() -> None:
     assert second.rewrite_calls == 1
 
 
+def test_router_preserves_three_provider_fallback_order() -> None:
+    gemini = FakeProvider(
+        name="gemini",
+        model="gemini-model",
+        error=InferenceError("gemini", "timed out"),
+    )
+    groq = FakeProvider(
+        name="groq",
+        model="groq-model",
+        error=InferenceError("groq", "rate limited"),
+    )
+    expected = RewriteResult("rewritten", "ollama", "local-model", 25)
+    ollama = FakeProvider(name="ollama", model="local-model", result=expected)
+
+    router = FallbackRouter((gemini, groq, ollama))
+
+    assert router.rewrite("rough") == expected
+    assert router.provider_names == ("gemini", "groq", "ollama")
+    assert (gemini.rewrite_calls, groq.rewrite_calls, ollama.rewrite_calls) == (1, 1, 1)
+
+
 def test_router_converts_unexpected_error_and_raises_when_all_providers_fail() -> None:
     first = FakeProvider(name="groq", model="cloud-model", error=RuntimeError("secret"))
     second_error = InferenceError("ollama", "service unavailable")
