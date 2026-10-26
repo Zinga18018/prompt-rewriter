@@ -62,13 +62,14 @@ def save(im, name):
 
 
 def slides():
-    im, d = base("01 / THE IDEA", "WINDOWS DESKTOP MVP")
-    pill(d, (80, 183), "LOCAL OLLAMA RUN")
-    text(d, (80, 286), "A rough request.\nA clearer prompt.", 92, bold=True, spacing=9)
+    im, d = base("01 / The request", "Windows desktop MVP")
+    pill(d, (80, 183), "Recorded with local Ollama")
+    text(d, (80, 286), "I need a Python plan.\nHere's my rough request.", 92, bold=True, spacing=9)
     text(
         d,
         (85, 567),
-        "Select text in Notepad, use one hotkey,\nand keep working in the same field.",
+        "I select the text and press Ctrl+Shift+Space.\n"
+        "The rewritten prompt goes back into the same field.",
         43,
         color=MUTED,
     )
@@ -76,8 +77,8 @@ def slides():
     text(d, (111, 791), "Ctrl  +  Shift  +  Space", 36, color=ACCENT, bold=True)
     save(im, "01-intro")
 
-    im, d = base("02 / THE REQUEST", "SYNTHETIC EXAMPLE")
-    text(d, (80, 171), "Start with what you know.", 66, bold=True)
+    im, d = base("02 / Before rewriting", "Example request")
+    text(d, (80, 171), "Here's the request I started with.", 66, bold=True)
     d.rounded_rectangle((80, 303, 1840, 782), radius=24, fill=CARD)
     text(
         d,
@@ -88,31 +89,31 @@ def slides():
         49,
         spacing=26,
     )
-    text(d, (126, 669), "Original wording from the source recording", 28, color=MUTED)
+    text(d, (126, 669), "The same request you'll see in the recording.", 28, color=MUTED)
     text(
         d,
         (80, 840),
-        "Goal  /  experience  /  available time  /  weekly deliverable",
+        "A beginner, 45 minutes a day, and one project each week.",
         31,
         color=ACCENT,
     )
     save(im, "02-request")
 
-    im, d = base("03 / THE ACTUAL DESKTOP RUN", "CONTINUOUS FOOTAGE · NORMAL SPEED")
-    pill(d, (1440, 61), "OLLAMA · LOCAL")
-    text(d, (80, 170), "One field, from selection to result.", 63, bold=True)
+    im, d = base("03 / Watch the rewrite", "Existing recording / normal speed")
+    pill(d, (1440, 61), "Ollama / local")
+    text(d, (80, 170), "Here's the actual Notepad run.", 63, bold=True)
     d.rounded_rectangle((77, 297, 1843, 809), radius=14, fill="#344B57")
     text(
         d,
         (80, 844),
-        "The source wait is preserved. No speed-up or output substitution.",
+        "This plays at the recorded speed, including the wait.",
         30,
         color=MUTED,
     )
     save(im, "03-live")
 
-    im, d = base("04 / READ THE RESULT", "EXACT TRANSCRIPT · EDITORIAL LINE BREAKS")
-    text(d, (80, 162), "Five sections. One usable prompt.", 61, bold=True)
+    im, d = base("04 / After rewriting", "Same output / line breaks added for reading")
+    text(d, (80, 162), "Here's what came back.", 61, bold=True)
     fields = [
         ("ROLE", "Data Science Educator"),
         ("CONTEXT", "Beginner"),
@@ -140,15 +141,13 @@ def slides():
         )
     save(im, "04-result")
 
-    im, d = base(
-        "05 / WHAT THE CODE CHECKS", "ARCHITECTURE EXPLANATION · NOT EXTRA CAPTURED BEHAVIOR"
-    )
-    text(d, (80, 158), "A guarded copy → rewrite → paste.", 61, bold=True)
+    im, d = base("05 / What happens before paste", "Code explanation / not another recorded scene")
+    text(d, (80, 158), "What the app checks before pasting.", 61, bold=True)
     stages = [
-        ("01", "Check selection", "Empty, oversized and already\nstructured text can stop here."),
-        ("02", "Get a valid result", "Configured provider order;\nstrict five-field validation."),
-        ("03", "Re-check the desktop", "Focus, target text and\nclipboard must still be safe."),
-        ("04", "Send paste", "Then restore the prior plain-\ntext clipboard when safe."),
+        ("01", "Check the text", "Is it empty, too long,\nor already structured?"),
+        ("02", "Try the providers", "Try the configured providers\nand validate the response."),
+        ("03", "Check the app again", "Has the target text, focus\nor clipboard changed?"),
+        ("04", "Paste the result", "Restore the old plain-text\nclipboard value if safe."),
     ]
     for i, (n, title, desc) in enumerate(stages):
         x = 80 + i * 448
@@ -159,37 +158,37 @@ def slides():
         if i < 3:
             text(d, (x + 424, 462), "→", 27, color=ACCENT)
     d.rounded_rectangle((80, 705, 1840, 856), radius=20, fill="#332A26")
-    text(d, (110, 727), "Changed focus, changed clipboard or unusable response?", 33, bold=True)
+    text(d, (110, 727), "If something changes, the app can stop before pasting.", 33, bold=True)
     text(
         d,
         (110, 783),
-        "The workflow can cancel before pasting. These paths are covered by tests.",
+        "Those checks are covered by tests; a cancellation isn't shown in this recording.",
         30,
         color="#E0BA9E",
     )
     save(im, "05-checks")
 
-    im, d = base("06 / SCOPE & SOURCE", "CAPTIONED CASE STUDY · RE-EDITED OCTOBER 2026")
-    text(d, (80, 171), "Small tool. Clear boundaries.", 70, bold=True)
+    im, d = base("06 / About this recording", "Reused recording / October 2026 edit")
+    text(d, (80, 171), "One successful rewrite in Notepad.", 70, bold=True)
     text(
         d,
         (80, 314),
-        "01  Real Notepad recording, reused from the existing local demo\n"
-        "02  One uninterrupted selection-to-result sequence\n"
-        "03  Local route shown; no cloud inference claimed",
+        "This is the existing Notepad recording, edited for easier reading.\n"
+        "The full rewrite plays at its original speed.\n"
+        "The original project documents this as a local Ollama run.",
         36,
         spacing=24,
     )
     text(
         d,
         (80, 566),
-        "This is a Windows MVP. Clipboard recovery is plain-text and best effort.\n"
-        "Structural validation does not prove factual accuracy or app compatibility.",
+        "This worked in Notepad. Other apps may behave differently.\n"
+        "Clipboard recovery is plain-text and best effort; model output still needs a check.",
         32,
         color=MUTED,
         spacing=15,
     )
-    pill(d, (80, 730), "READ THE CODE + WATCH THE UNCUT TAKE")
+    pill(d, (80, 730), "Code and full recording in the repository")
     text(d, (80, 815), "github.com/Zinga18018/prompt-rewriter", 35, color=ACCENT)
     save(im, "06-outro")
 
