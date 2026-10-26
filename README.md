@@ -2,7 +2,7 @@
 
 [![CI](https://github.com/Zinga18018/prompt-rewriter/actions/workflows/ci.yml/badge.svg)](https://github.com/Zinga18018/prompt-rewriter/actions/workflows/ci.yml)
 
-Turn rough selected text into a structured, paste-ready AI prompt with one global hotkey.
+Rewrite selected text into a structured prompt without leaving the app you're using.
 
 Prompt Rewriter is a Windows-first Python desktop tool. Select text in an editable app, press
 `Ctrl+Shift+Space`, and the tool replaces the selection with a prompt organized into **Role**,
@@ -11,23 +11,29 @@ Prompt Rewriter is a Windows-first Python desktop tool. Select text in an editab
 > **Project status:** tested MVP for learning and portfolio use. It is not production-ready and
 > should not be trusted with sensitive text or irreplaceable clipboard contents.
 
-[![Prompt Rewriter trailer](assets/prompt-rewriter-trailer-poster.png)](assets/prompt-rewriter-trailer.mp4)
+[![Watch the 68-second Prompt Rewriter case study](assets/prompt-rewriter-case-study-poster.png)](assets/prompt-rewriter-case-study.mp4)
 
-**[Watch the cinematic trailer](assets/prompt-rewriter-trailer.mp4)** ·
+**[Watch the 68-second case study](assets/prompt-rewriter-case-study.mp4)** ·
 **[Watch the continuous live demo](assets/prompt-rewriter-live-demo.mp4)**
 
-Both videos use one recorded Notepad run with the local Ollama route. The trailer is edited for
-pacing and adds visual labels; the live demo preserves the recorded wait from text selection to
-replacement. Neither video is a universal latency or cross-application compatibility benchmark.
-The rendering script uses a local source recording (`prompt-rewriter-capture-v2.mp4`) that is
-intentionally excluded from Git; the finished videos above are included in this repository.
+The case study is a new captioned edit of the existing Notepad recording. It shows a synthetic
+Python-learning request, the complete selection-to-result sequence at normal speed, a readable
+transcript, and the checks implemented in the code. The original project documents this recording
+as a local Ollama run; the footage does not show a provider log. No cloud inference or new desktop
+capture is claimed. The architecture section is an explanation, not extra recorded behavior.
+
+Source footage is cropped for readability. The recorded wait is preserved at **00:14–00:35**;
+the introduction, transcript and closing cards are editorial additions. This is one successful
+Notepad example, not a latency or cross-application compatibility benchmark. See
+[demo provenance and rendering](docs/DEMO.md). The [earlier 15-second trailer](assets/prompt-rewriter-trailer.mp4)
+is still available.
 
 ## What it does
 
 1. Listens for a global `Ctrl+Shift+Space` hotkey.
 2. Copies the currently selected text and rejects an empty or oversized selection.
 3. Sends the text through the configured provider route:
-   - Gemini Flash-Lite for low-latency cloud inference when explicitly enabled.
+   - Gemini for cloud inference when explicitly enabled.
    - Groq for cloud inference when a key is configured.
    - Ollama for local inference or fallback.
 4. Validates a strict five-field response before it can reach the clipboard.
@@ -63,9 +69,9 @@ Weekly plan with project details and study schedule
 
 Model wording can vary. The five headings and local validation rules do not.
 
-## Why this is more than a shortcut script
+## Engineering decisions
 
-The interesting part is the boundary between desktop automation and nondeterministic model output:
+Most of the code handles what happens between copying text and pasting a model response:
 
 - The hotkey callback schedules work on one background worker, so the listener stays responsive and
   repeated triggers cannot overlap.
@@ -79,29 +85,18 @@ The interesting part is the boundary between desktop automation and nondetermini
 
 ## Architecture
 
-```text
-Ctrl+Shift+Space
-       |
-       v
-single background worker
-       |
-       v
-copy + selection validation
-       |
-       v
-Gemini  ---- failure ---->  Groq  ---- failure ---->  Ollama
-   |                         |                            |
-   +-------------------------+----------- result --------+
-                     |
-                     v
-strict five-field validation
-                     |
-                     v
-focus + input + clipboard re-check
-                     |
-                     v
-paste + best-effort text restoration
-```
+![Guarded Windows copy-rewrite-paste transaction, including cancellation paths](assets/guarded-workflow.svg)
+
+[Editable Mermaid source](docs/guarded-workflow.mmd)
+
+Each provider adapter validates its response before the router accepts it. A failed or invalid
+response advances to the next configured provider, once each. The workflow then checks the target
+text, focus, input activity and clipboard ownership again before sending paste. An accessibility
+fallback can read and replace the whole focused field when normal copy does not expose a selection.
+
+The diagram summarizes the normal path and pre-paste cancellation. Checks narrow the race window;
+they do not make Windows input atomic. An exception after paste was attempted can still mean input
+was sent, and clipboard restoration remains conditional and plain-text only.
 
 | Module | Responsibility |
 | --- | --- |
@@ -187,11 +182,10 @@ GEMINI_API_KEY=
 GEMINI_MODEL=gemini-3.5-flash-lite
 ```
 
-The Gemini request uses the API-key header rather than putting the credential in the URL. It uses
-the current Interactions API with storage explicitly disabled. The default model is the stable
-Flash-Lite model selected for low-latency structured rewriting. When Gemini fails or times out, the
-existing router tries Ollama once. Selected text leaves the computer whenever Gemini is first in
-the configured route.
+The Gemini adapter sends its key in a header and posts to `/interactions` with `store: false`.
+The configured model name is a setting, not evidence of model access or latency. With the route
+above, a failed or timed-out Gemini request advances to Ollama once. Selected text leaves the
+computer whenever the route attempts Gemini. Check provider availability before enabling it.
 
 ### Run the hotkey listener
 
@@ -255,15 +249,19 @@ See [SECURITY.md](SECURITY.md) for the threat boundary and responsible reporting
 
 ## Verified status
 
-Current workspace verification on **September 30, 2026**:
+This review branch was checked on **October 26, 2026**: **95 automated tests passed** and
+`python -m ruff check .` passed against the source in this branch. Provider and desktop edge cases
+use controlled fakes; no cloud inference or fresh hotkey recording was performed for this review.
+The new video is a re-edit of the original recording, with the recorded transaction preserved.
+
+Earlier recorded evidence on **September 30, 2026**:
 
 - The automated test suite passes locally.
 - `python -m pip check` reported no broken requirements.
 - A local Ollama rewrite and a full Notepad copy-rewrite-paste flow completed successfully for the
   recorded demo.
-- The Gemini adapter, schema, routing, error sanitization, and diagnostics are verified with mocked
-  API responses. No live Gemini request was made with the exposed credential; live verification
-  remains pending until a newly rotated key is configured locally.
+- The Gemini adapter, schema, routing, error sanitization, and diagnostics were checked with mocked
+  API responses. That recorded verification did not establish live Gemini inference.
 
 The automated suite uses controlled fakes for provider and desktop edge cases. One successful
 Notepad run does not prove compatibility with every Windows application.
@@ -315,5 +313,5 @@ with `OLLAMA_KEEP_ALIVE` and choose a model that fits available RAM.
 
 ## Scope and license
 
-This repository is a compact, inspectable systems-and-AI engineering MVP—not a promise of safe
-production deployment. No open-source license has been selected yet.
+This is a Windows desktop MVP for learning and portfolio review. No open-source license has been
+selected yet.

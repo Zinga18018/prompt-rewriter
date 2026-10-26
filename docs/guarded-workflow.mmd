@@ -1,0 +1,22 @@
+flowchart TD
+    A["Global hotkey → one background worker"] --> B["Snapshot target focus + restorable plain-text clipboard"]
+    B --> C["Copy selection; use accessibility fallback if copy is unavailable"]
+    C --> D{"Nonempty, within size limit,<br/>not already structured?"}
+    D -->|No| X["Stop / cancel before paste"]
+    D -->|Yes| E["Try configured providers in order<br/>Gemini, Groq and/or Ollama"]
+    E --> F{"Adapter returns a valid<br/>five-field response?"}
+    F -->|Error / invalid response| G{"Another configured provider?"}
+    G -->|Yes| E
+    G -->|No| X
+    F -->|Yes| H["Re-check target text, focus,<br/>input activity + clipboard ownership"]
+    H --> I{"State still acceptable?"}
+    I -->|No| X
+    I -->|Yes| J["Write result → re-check → send paste"]
+    J --> K["Restore prior plain text only<br/>if clipboard is still owned"]
+    J -. "Final re-check fails" .-> X
+    classDef action fill:#152232,stroke:#7189a0,color:#f4f3ec;
+    classDef gate fill:#243c30,stroke:#bbe58b,color:#f4f3ec;
+    classDef stop fill:#332a26,stroke:#e0ba9e,color:#f4f3ec;
+    class A,B,C,E,H,J,K action;
+    class D,F,G,I gate;
+    class X stop;

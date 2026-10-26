@@ -1,0 +1,37 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1440" height="1110" viewBox="0 0 1440 1110" role="img" aria-labelledby="title desc">
+<title id="title">Prompt Rewriter: guarded desktop transaction</title>
+<desc id="desc">A hotkey schedules one worker. It snapshots focus and clipboard, captures and validates text, tries configured providers with strict response validation, rechecks desktop state, then sends paste and conditionally restores plain text. Invalid input, exhausted providers or changed desktop state stop before paste.</desc>
+<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L10 5L0 10Z" fill="#bbe58b"/></marker><style>text{font-family:Segoe UI,Arial,sans-serif;fill:#f4f3ec}.title{font-size:34px;font-weight:700}.label{font-size:25px;font-weight:600}.sub{font-size:20px;fill:#aebbc7}.edge{fill:none;stroke:#bbe58b;stroke-width:3;marker-end:url(#arrow)}.cancel{fill:none;stroke:#e0ba9e;stroke-width:3;marker-end:url(#arrow)}.box{fill:#152232;stroke:#7189a0;stroke-width:2}.gate{fill:#243c30;stroke:#bbe58b;stroke-width:2}</style></defs>
+<rect width="1440" height="1110" rx="24" fill="#0c1420"/>
+<text x="65" y="65" class="title">A guarded copy → rewrite → paste</text>
+<text x="65" y="101" class="sub">Implemented Windows workflow · configured route · explicit stop paths</text>
+<g text-anchor="middle">
+<rect x="65" y="150" width="890" height="88" rx="16" class="box"/>
+<text x="510" y="188" class="label">Hotkey → one background worker</text><text x="510" y="219" class="sub">Snapshot target focus and a restorable plain-text clipboard</text>
+<path d="M510 238V272" class="edge"/>
+<rect x="65" y="276" width="890" height="100" rx="16" class="box"/>
+<text x="510" y="315" class="label">Capture and check the request</text><text x="510" y="347" class="sub">Copy / accessibility fallback · nonempty · size limit · not already structured</text>
+<path d="M510 376V410" class="edge"/>
+<rect x="65" y="414" width="890" height="115" rx="16" class="gate"/>
+<text x="510" y="451" class="label">Try providers in the configured order</text><text x="510" y="485" class="sub">Each adapter validates the five-field response before returning</text><text x="510" y="512" class="sub">Errors or malformed output → next provider, once each</text>
+<path d="M510 529V563" class="edge"/>
+<rect x="65" y="567" width="890" height="103" rx="16" class="gate"/>
+<text x="510" y="606" class="label">Re-check the desktop state</text><text x="510" y="640" class="sub">Target text · focus · input activity · clipboard ownership</text>
+<path d="M510 670V704" class="edge"/>
+<rect x="65" y="708" width="890" height="106" rx="16" class="box"/>
+<text x="510" y="747" class="label">Write result → re-check → send paste</text><text x="510" y="781" class="sub">Select the whole field only when the accessibility fallback requires it</text>
+<path d="M510 814V848" class="edge"/>
+<rect x="65" y="852" width="890" height="88" rx="16" class="box"/>
+<text x="510" y="889" class="label">Restore prior plain text when safe</text><text x="510" y="920" class="sub">Only while the app still owns the clipboard value</text>
+<rect x="1040" y="444" width="335" height="188" rx="18" fill="#332a26" stroke="#e0ba9e" stroke-width="2"/>
+<text x="1207" y="489" class="label">Stop / cancel</text><text x="1207" y="529" class="sub">No replacement</text><text x="1207" y="560" class="sub">on these pre-paste paths</text><text x="1207" y="598" class="sub">Restore only if safe</text>
+</g>
+<path d="M955 194H1010V480H1037" class="cancel"/><text x="1023" y="254" class="sub" fill="#e0ba9e">Unsafe clipboard</text>
+<path d="M955 326H988V510H1037" class="cancel"/>
+<path d="M955 472H1037" class="cancel"/><text x="987" y="410" class="sub">Invalid input / no usable provider</text>
+<path d="M955 617H1037" class="cancel"/>
+<path d="M955 760H1007V600H1037" class="cancel"/><text x="1030" y="703" class="sub">State changed</text>
+<text x="65" y="1002" class="sub">Source: daemon.py · workflow.py · providers/router.py · providers/*_provider.py · prompts.py</text>
+<text x="65" y="1040" class="sub">Limits: desktop checks are not atomic; a paste-time failure may happen after input was sent.</text>
+<text x="65" y="1074" class="sub">Clipboard restoration is plain-text and best effort. A valid structure does not prove factual accuracy.</text>
+</svg>

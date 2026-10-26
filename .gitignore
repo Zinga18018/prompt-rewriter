@@ -22,3 +22,4 @@ dist/
 /prompt-rewriter-v2-contact.png
 /prompt-rewriter-v2-transition.png
 *.log
+/.demo-case-study/
